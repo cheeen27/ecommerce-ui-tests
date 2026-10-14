@@ -1,6 +1,9 @@
 
 import pytest
 from playwright.sync_api import sync_playwright
+from pages.login_page import LoginPage
+from pages.inventory_page import InventoryPage
+from pages.cart_page import CartPage
 
 
 @pytest.fixture
@@ -16,11 +19,22 @@ def page():
 
 
 @pytest.fixture
-def logged_in_page(page):
-    page.locator("#user-name").fill("standard_user")
-    page.locator("#password").fill("secret_sauce")
-    page.locator("#login-button").click()
+def logged_in_page(page, login_page):
+    login_page.login("standard_user", "secret_sauce")
 
     page.locator(".inventory_item").first.wait_for(state="visible")
 
     return page
+
+
+@pytest.fixture
+def login_page(page):
+    return LoginPage(page)
+
+@pytest.fixture
+def inventory_page(logged_in_page):
+    return InventoryPage(logged_in_page)
+
+@pytest.fixture
+def cart_page(logged_in_page):
+    return CartPage(logged_in_page)

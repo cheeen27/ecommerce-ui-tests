@@ -1,69 +1,64 @@
 
-def test_login_success(page):
-    page.locator("#user-name").fill("standard_user")
-    page.locator("#password").fill("secret_sauce")
-    page.get_by_role("button", name="Login").click()
+
+def test_login_success(login_page, page):
+    login_page.login("standard_user", "secret_sauce")
     assert page.url.endswith("/inventory.html")
 
 
-def test_login_wrong_password(page):
-    page.locator("#user-name").fill("standard_user")
-    page.locator("#password").fill("wrong_password")
-    page.locator("#login-button").click()
-    error_message = page.locator("[data-test='error']")
-    assert error_message.is_visible()
-    assert "Username and password do not match" in error_message.inner_text()
+def test_login_wrong_password(login_page):
+    login_page.login("standard_user", "wrong_password")
 
-
-def test_products_display(logged_in_page):
-    products = logged_in_page.locator(".inventory_item")
-    products.first.wait_for(state="visible")
-    assert products.count() > 0
-
-
-def test_add_product_to_cart(logged_in_page):
-    logged_in_page.locator(".inventory_item").first.locator("button").click()
-    cart_badge = logged_in_page.locator(".shopping_cart_badge")
-    assert cart_badge.inner_text() == "1"
-
-
-def test_remove_product_from_cart(logged_in_page):
-    logged_in_page.locator(".inventory_item").first.locator("button").click()
-    logged_in_page.locator(".shopping_cart_link").click()
-
-    product = logged_in_page.get_by_text("Sauce Labs Backpack", exact=True)
-    assert product.is_visible()
-
-    logged_in_page.get_by_role("button", name="Remove").click()
-    assert logged_in_page.locator(".shopping_cart_badge").count() == 0
-
-
-def test_login_empty_username(page):
-    page.locator("#password").fill("secret_sauce")
-    page.locator("#login-button").click()
-
-    error_message = page.locator("[data-test='error']")
-    assert error_message.is_visible()
-    assert "Username is required" in error_message.inner_text()
-
-
-def test_login_empty_password(page):
-    page.locator("#user-name").fill("standard_user")
-    page.locator("#login-button").click()
-
-    error_message = page.locator("[data-test='error']")
-    assert error_message.is_visible()
-    assert "Password is required" in error_message.inner_text()
-
-
-def test_cart_contains_added_product(logged_in_page):
-    product = logged_in_page.locator(".inventory_item").first
-    product_name = product.locator(".inventory_item_name").inner_text()
-
-    product.locator("button").click()
-    logged_in_page.locator(".shopping_cart_link").click()
-
-    cart_product = logged_in_page.get_by_text(
-        product_name, exact=True
+    assert login_page.error_message.is_visible()
+    assert "Username and password do not match" in (
+        login_page.error_message.inner_text()
     )
-    assert cart_product.is_visible()
+
+
+def test_products_display(inventory_page):
+    assert inventory_page.get_product_count() > 0
+
+
+def test_add_product_to_cart(inventory_page):
+    inventory_page.add_first_product_to_cart()
+    assert inventory_page.get_cart_count() == 1
+
+
+def test_remove_product_from_cart(inventory_page, cart_page):
+    inventory_page.add_first_product_to_cart()
+    cart_page.open()
+
+    assert cart_page.is_product_visible("Sauce Labs Backpack")
+
+    cart_page.remove_first_product()
+    assert inventory_page.get_cart_count() == 0
+
+
+
+def test_login_empty_username(login_page):
+    login_page.login("", "secret_sauce")
+
+    assert login_page.error_message.is_visible()
+    assert "Username is required" in (
+        login_page.error_message.inner_text()
+    )
+
+
+def test_login_empty_password(login_page):
+    login_page.login("standard_user", "")
+
+    assert login_page.error_message.is_visible()
+    assert "Password is required" in (
+        login_page.error_message.inner_text()
+    )
+
+
+def test_cart_contains_added_product(inventory_page, cart_page):
+    first_product = inventory_page.products.first
+    product_name = first_product.locator(
+        ".inventory_item_name"
+    ).inner_text()
+
+    inventory_page.add_first_product_to_cart()
+    cart_page.open()
+
+    assert cart_page.is_product_visible(product_name)

@@ -22,14 +22,14 @@
 | 商品 | 商品列表正常显示 |
 | 购物车 | 添加商品后购物车数量更新 |
 | 购物车 | 移除商品后购物车状态更新 |
-| 购物车 | 添加商品后，在购物车页面验证商品名称 |
+| 购物车 | 添加商品后验证购物车商品信息 |
 
 ## 环境准备
 
 建议使用 Python 3.12。
 
 ```bash
-git clone <your-repository-url>
+git clone <https://github.com/cheeen27/ecommerce-ui-tests>
 cd ecommerce-ui-tests
 
 python -m venv .venv
@@ -59,6 +59,11 @@ python -m pytest -v --html=report.html --self-contained-html
 
 ```text
 ecommerce-ui-tests/
+├── pages/
+│   ├── __init__.py
+│   ├── login_page.py
+│   ├── inventory_page.py
+│   └── cart_page.py
 ├── tests/
 │   ├── conftest.py
 │   └── test_login.py
@@ -66,6 +71,10 @@ ecommerce-ui-tests/
 ├── .gitignore
 └── README.md
 ```
+
+- `pages/`：封装登录、商品列表和购物车页面的定位与操作。
+- `tests/`：存放 UI 自动化测试用例。
+- `conftest.py`：管理 pytest fixtures，包括页面初始化、登录和页面对象。
 
 ## 项目说明
 
