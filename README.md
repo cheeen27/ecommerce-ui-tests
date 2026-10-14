@@ -29,7 +29,7 @@
 建议使用 Python 3.12。
 
 ```bash
-git clone <https://github.com/cheeen27/ecommerce-ui-tests>
+git clone <https://github.com/cheeen27/saucedemo-ui-tests>
 cd ecommerce-ui-tests
 
 python -m venv .venv
