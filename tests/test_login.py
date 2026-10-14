@@ -36,3 +36,21 @@ def test_remove_product_from_cart(logged_in_page):
 
     logged_in_page.get_by_role("button", name="Remove").click()
     assert logged_in_page.locator(".shopping_cart_badge").count() == 0
+
+
+def test_login_empty_username(page):
+    page.locator("#password").fill("secret_sauce")
+    page.locator("#login-button").click()
+
+    error_message = page.locator("[data-test='error']")
+    assert error_message.is_visible()
+    assert "Username is required" in error_message.inner_text()
+
+
+def test_login_empty_password(page):
+    page.locator("#user-name").fill("standard_user")
+    page.locator("#login-button").click()
+
+    error_message = page.locator("[data-test='error']")
+    assert error_message.is_visible()
+    assert "Password is required" in error_message.inner_text()
