@@ -1,0 +1,16 @@
+
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Pytest cache
+.pytest_cache/
+
+# Generated test report
+report.html
+
+# macOS system files
+.DS_Store
