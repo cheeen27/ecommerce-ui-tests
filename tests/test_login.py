@@ -2,7 +2,7 @@
 def test_login_success(page):
     page.locator("#user-name").fill("standard_user")
     page.locator("#password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page.get_by_role("button", name="Login").click()
     assert page.url.endswith("/inventory.html")
 
 
@@ -54,3 +54,16 @@ def test_login_empty_password(page):
     error_message = page.locator("[data-test='error']")
     assert error_message.is_visible()
     assert "Password is required" in error_message.inner_text()
+
+
+def test_cart_contains_added_product(logged_in_page):
+    product = logged_in_page.locator(".inventory_item").first
+    product_name = product.locator(".inventory_item_name").inner_text()
+
+    product.locator("button").click()
+    logged_in_page.locator(".shopping_cart_link").click()
+
+    cart_product = logged_in_page.get_by_text(
+        product_name, exact=True
+    )
+    assert cart_product.is_visible()
